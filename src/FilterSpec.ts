@@ -1,15 +1,23 @@
 export class FilterSpec {
-  private attribute: string
+  private attributes: string[]
 
   private value: string
 
-  constructor(attribute: string, value: string) {
-    this.attribute = attribute
-    this.value = value
+  constructor(...value: string[]) {
+    this.value = value.pop() || ''
+    this.attributes = value
   }
 
-  getAttribute(): string {
-    return this.attribute
+  getFilters(): string[] {
+    return this.attributes
+  }
+
+  toString(): string {
+    return this.attributes.join(',')
+  }
+
+  getQuery(): string {
+    return `filter${this.attributes.reduce((acc, val) => (acc += `[${val}]`), '')}`
   }
 
   getValue(): string {

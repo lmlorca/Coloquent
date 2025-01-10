@@ -1,4 +1,3 @@
-import { ClassFilterSpec } from './ClassFilterSpec'
 import { FilterSpec } from './FilterSpec'
 import { Option } from './Option'
 import { PaginationSpec } from './paginationspec/PaginationSpec'
@@ -42,19 +41,7 @@ export class Query {
 
   protected addFilterParameters(searchParams: QueryParam[]): void {
     for (let f of this.filters) {
-      if (f instanceof ClassFilterSpec) {
-        let ff = <ClassFilterSpec>f
-        searchParams.push(
-          new QueryParam(
-            `filter[${ff.getClass()}][${ff.getAttribute()}]`,
-            ff.getValue()
-          )
-        )
-      } else {
-        searchParams.push(
-          new QueryParam(`filter[${f.getAttribute()}]`, f.getValue())
-        )
-      }
+      searchParams.push(new QueryParam(f.getQuery(), f.getValue()))
     }
   }
 

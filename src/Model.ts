@@ -143,10 +143,9 @@ export abstract class Model {
 
   public static where<M extends typeof Model & { new (): Model }>(
     this: M,
-    attribute: string,
-    value: string
+    ...params: string[]
   ): Builder<InstanceType<M>, PluralResponse<InstanceType<M>>> {
-    return new Builder<InstanceType<M>>(this).where(attribute, value)
+    return new Builder<InstanceType<M>>(this).where(...params)
   }
 
   public static orderBy<M extends typeof Model & { new (): Model }>(

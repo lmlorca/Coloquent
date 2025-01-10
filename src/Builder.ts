@@ -1,3 +1,4 @@
+import { useQuery as uq } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 import { FilterSpec } from './FilterSpec'
 import { HttpClient } from './httpclient/HttpClient'
@@ -9,6 +10,7 @@ import { PageBasedPaginationSpec } from './paginationspec/PageBasedPaginationSpe
 import { PaginationStrategy } from './PaginationStrategy'
 import { Query } from './Query'
 import { QueryMethods } from './QueryMethods'
+import { UseQueryBuilderOptions } from './reactquery/QueryOptions'
 import { PluralResponse } from './response/PluralResponse'
 import { RetrievalResponse } from './response/RetrievalResponse'
 import { SingularResponse } from './response/SingularResponse'
@@ -142,9 +144,11 @@ export class Builder<
       )
   }
 
-  public where(attribute: string, value: string): Builder<M, GET_RESPONSE> {
+  public where(...params: string[]): Builder<M, GET_RESPONSE> {
     const clone = this.clone()
-    clone.getQuery().addFilter(new FilterSpec(attribute, value))
+
+    clone.getQuery().addFilter(new FilterSpec(...params))
+
     return clone
   }
 
@@ -264,5 +268,50 @@ export class Builder<
 
   private getHttpClient(): HttpClient {
     return this.httpClient
+  }
+
+  public useQuery() {
+    return {
+      find: <T extends SingularResponse<M>, TData = T>(
+        id: string | number,
+        opts?: UseQueryBuilderOptions<T, TData>
+      ) =>
+        uq({
+          queryKey: this.getQueryKey(`find('${id}')`),
+          queryFn: () => this.find(id),
+          ...opts,
+        }),
+      first: <T extends SingularResponse<M>, TData = T>(
+        opts?: UseQueryBuilderOptions<T, TData>
+      ) =>
+        uq({
+          queryKey: this.getQueryKey('first()'),
+          queryFn: () => this.first(),
+          ...opts,
+        }),
+    }
+  }
+
+  private getQueryKey(verb: string) {
+    let queryKey = `glvoice.${this.getQuery().getJsonApiType()}.`
+
+    if (this.getQuery().getInclude().length) {
+      const includes = this.getQuery().getInclude().sort()
+      includes.forEach((include) => (queryKey += `with('${include}').`))
+    }
+
+    if (this.getQuery().getFilters().length) {
+      const filters = this.getQuery()
+        .getFilters()
+        .sort((a, b) => a.toString().localeCompare(b.toString()))
+      filters.forEach(
+        (filter) =>
+          (queryKey += `where(${filter.getFilters().map((f) => `'${f}'`)},'${filter.getValue()}').`)
+      )
+    }
+
+    queryKey += `${verb}`
+
+    return [queryKey]
   }
 }

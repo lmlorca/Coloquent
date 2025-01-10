@@ -28,3 +28,22 @@ export { RetrievalResponse } from './response/RetrievalResponse'
 export { SaveResponse } from './response/SaveResponse'
 export { SingularResponse } from './response/SingularResponse'
 export { SortDirection } from './SortDirection'
+
+import { GLVoiceResources, SDK } from './glvoiceresources/GLVoiceResources'
+
+declare type GLVoiceSDK = {
+  setToken: (token: string) => void
+} & typeof GLVoiceResources
+
+export default function (config: { baseUrl?: string }): GLVoiceSDK {
+  SDK.jsonApiBaseUrl = config.baseUrl || ''
+
+  return {
+    ...GLVoiceResources,
+    setToken: function (token: string) {
+      SDK.effectiveHttpClient.getImplementingClient().defaults.headers[
+        'Authorization'
+      ] = `Bearer ${token}`
+    },
+  }
+}
