@@ -1,4 +1,4 @@
 export enum PaginationStrategy {
-    PageBased,
-    OffsetBased
+  PageBased,
+  OffsetBased,
 }

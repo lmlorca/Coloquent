@@ -1,16 +1,15 @@
-export class Resource
-{
-    public type: string;
+export class Resource {
+  public type: string
 
-    public id: string;
+  public id: string
 
-    public attributes: {
-        [key: string]: any
-    };
+  public attributes: {
+    [key: string]: any
+  }
 
-    public relationships: {
-        [relationshipName: string]: {
-            data: any
-        }
-    };
+  public relationships: {
+    [relationshipName: string]: {
+      data: any
+    }
+  }
 }

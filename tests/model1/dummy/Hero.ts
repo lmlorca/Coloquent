@@ -1,37 +1,30 @@
-import {BaseModel} from './BaseModel';
-import {ToManyRelation, ToOneRelation} from "../../../dist";
+import { ToManyRelation, ToOneRelation } from '../../../dist'
+import { BaseModel } from './BaseModel'
 
-export class Hero extends BaseModel
-{
-    protected static jsonApiType = 'heros';
+export class Hero extends BaseModel {
+  protected static jsonApiType = 'heros'
 
-    public friends(): ToManyRelation
-    {
-        return this.hasMany(Hero);
-    }
+  public friends(): ToManyRelation {
+    return this.hasMany(Hero)
+  }
 
-    public foes(): ToManyRelation
-    {
-        return this.hasMany(Hero, 'enemies');
-    }
+  public foes(): ToManyRelation {
+    return this.hasMany(Hero, 'enemies')
+  }
 
-    public rival(): ToOneRelation
-    {
-        return this.hasOne(Hero);
-    }
+  public rival(): ToOneRelation {
+    return this.hasOne(Hero)
+  }
 
-    public getName(): string
-    {
-        return this.getAttribute('name');
-    }
+  public getName(): string {
+    return this.getAttribute('name')
+  }
 
-    public setName(name: string): void
-    {
-        this.setAttribute('name', name);
-    }
+  public setName(name: string): void {
+    this.setAttribute('name', name)
+  }
 
-    public getFoes(): Hero[]
-    {
-        return this.getRelation('foes');
-    }
+  public getFoes(): Hero[] {
+    return this.getRelation('foes')
+  }
 }

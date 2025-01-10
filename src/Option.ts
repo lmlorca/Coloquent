@@ -1,22 +1,18 @@
-export class Option
-{
-    protected parameter: string;
+export class Option {
+  protected parameter: string
 
-    protected value: string;
+  protected value: string
 
-    constructor(parameter: string, value: string)
-    {
-        this.parameter = parameter;
-        this.value = value;
-    }
+  constructor(parameter: string, value: string) {
+    this.parameter = parameter
+    this.value = value
+  }
 
-    public getParameter(): string
-    {
-        return this.parameter;
-    }
+  public getParameter(): string {
+    return this.parameter
+  }
 
-    public getValue(): string
-    {
-        return this.value;
-    }
+  public getValue(): string {
+    return this.value
+  }
 }

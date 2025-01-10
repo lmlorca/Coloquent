@@ -1,24 +1,19 @@
-export class Map<T>
-{
-    protected data: {[key: string]: T};
+export class Map<T> {
+  protected data: { [key: string]: T }
 
-    constructor()
-    {
-        this.data = {};
-    }
+  constructor() {
+    this.data = {}
+  }
 
-    public get(key: string): T
-    {
-        return this.data[key];
-    }
+  public get(key: string): T {
+    return this.data[key]
+  }
 
-    public set(key: string, value: T): void
-    {
-        this.data[key] = value;
-    }
+  public set(key: string, value: T): void {
+    this.data[key] = value
+  }
 
-    public toArray(): {[key: string]: T}
-    {
-        return this.data;
-    }
+  public toArray(): { [key: string]: T } {
+    return this.data
+  }
 }

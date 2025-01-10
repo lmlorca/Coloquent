@@ -1,6 +1,5 @@
-export interface HttpClientResponse
-{
-    getData(): any
+export interface HttpClientResponse {
+  getData(): any
 
-    getUnderlying(): any
+  getUnderlying(): any
 }

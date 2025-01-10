@@ -1,19 +1,18 @@
-import {HttpClientResponse} from "../HttpClientResponse";
-import {AxiosResponse} from "axios";
+import { AxiosResponse } from 'axios'
+import { HttpClientResponse } from '../HttpClientResponse'
 
-export class AxiosHttpClientResponse implements HttpClientResponse
-{
-    private axiosResponse: AxiosResponse;
+export class AxiosHttpClientResponse implements HttpClientResponse {
+  private axiosResponse: AxiosResponse
 
-    constructor(axiosResponse: AxiosResponse) {
-        this.axiosResponse = axiosResponse;
-    }
+  constructor(axiosResponse: AxiosResponse) {
+    this.axiosResponse = axiosResponse
+  }
 
-    getData(): any {
-        return this.axiosResponse.data;
-    }
+  getData(): any {
+    return this.axiosResponse.data
+  }
 
-    getUnderlying(): any {
-        return this.axiosResponse;
-    }
+  getUnderlying(): any {
+    return this.axiosResponse
+  }
 }

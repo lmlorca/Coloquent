@@ -1,5 +1,5 @@
-import {expect} from 'chai';
-import {AxiosHttpClient, Model} from "../dist";
+import { expect } from 'chai'
+import { AxiosHttpClient, Model } from '../dist'
 
 describe('Model', () => {
   describe('static', () => {
@@ -8,15 +8,15 @@ describe('Model', () => {
         class Foo extends Model {}
 
         it('returns a new AxiosHttpClient', () => {
-          expect(Foo.effectiveHttpClient).to.be.an.instanceof(AxiosHttpClient);
-        });
+          expect(Foo.effectiveHttpClient).to.be.an.instanceof(AxiosHttpClient)
+        })
 
         it('memoizes the HttpClient', () => {
           const httpClient = Foo.effectiveHttpClient
 
-          expect(Foo.effectiveHttpClient).to.eql(httpClient);
-        });
-      });
+          expect(Foo.effectiveHttpClient).to.eql(httpClient)
+        })
+      })
 
       describe('with static httpClient', () => {
         const httpClient = new AxiosHttpClient()
@@ -27,18 +27,20 @@ describe('Model', () => {
 
         it('returns the httpClient', () => {
           expect(Foo.effectiveHttpClient).to.eql(httpClient)
-        });
-      });
-    });
+        })
+      })
+    })
 
     describe('effectiveJsonApiType', () => {
       describe('without static jsonApiType', () => {
         class Foo extends Model {}
 
         it('throws an Error', () => {
-          expect(() => { Foo.effectiveJsonApiType }).to.throw();
-        });
-      });
+          expect(() => {
+            Foo.effectiveJsonApiType
+          }).to.throw()
+        })
+      })
 
       describe('with static jsonApiType', () => {
         class Foo extends Model {
@@ -46,76 +48,84 @@ describe('Model', () => {
         }
 
         it('returns jsonApiType', () => {
-          expect(Foo.effectiveJsonApiType).to.eq('foos');
-        });
-      });
-    });
+          expect(Foo.effectiveJsonApiType).to.eq('foos')
+        })
+      })
+    })
 
     describe('effectiveJsonApiBaseUrl', () => {
       describe('without static jsonApiType', () => {
         class Foo extends Model {}
 
         it('throws an Error', () => {
-          expect(() => { Foo.effectiveJsonApiBaseUrl }).to.throw();
-        });
-      });
+          expect(() => {
+            Foo.effectiveJsonApiBaseUrl
+          }).to.throw()
+        })
+      })
 
       describe('with static jsonApiBaseUrl', () => {
         class Foo extends Model {
-          static jsonApiBaseUrl = 'http://coloquent.app/api';
+          static jsonApiBaseUrl = 'http://coloquent.app/api'
         }
 
         it('returns jsonApiBaseUrl', () => {
-          expect(Foo.effectiveJsonApiBaseUrl).to.eq('http://coloquent.app/api');
-        });
+          expect(Foo.effectiveJsonApiBaseUrl).to.eq('http://coloquent.app/api')
+        })
 
         describe('when jsonApiBaseUrl having trailing "/"', () => {
           class Foo extends Model {
-            static jsonApiBaseUrl = 'http://coloquent.app/api/';
+            static jsonApiBaseUrl = 'http://coloquent.app/api/'
           }
 
           it('returns jsonApiBaseUrl without trailing "/"', () => {
-            expect(Foo.effectiveJsonApiBaseUrl).to.eq('http://coloquent.app/api');
-          });
-        });
-      });
-    });
+            expect(Foo.effectiveJsonApiBaseUrl).to.eq(
+              'http://coloquent.app/api'
+            )
+          })
+        })
+      })
+    })
 
     describe('getJsonApiUrl', () => {
       describe('with static jsonApiBaseUrl and jsonApiType', () => {
         class Foo extends Model {
-          static jsonApiBaseUrl = 'http://coloquent.app/api';
-          static jsonApiType = 'foos';
+          static jsonApiBaseUrl = 'http://coloquent.app/api'
+          static jsonApiType = 'foos'
         }
 
         it('returns URL with jsonApiType as endpoint', () => {
           expect(Foo.getJsonApiUrl()).to.eq('http://coloquent.app/api/foos')
-        });
-      });
+        })
+      })
 
       describe('with static jsonApiBaseUrl and jsonApiType and endpoint', () => {
         class Foo extends Model {
-          static jsonApiBaseUrl = 'http://coloquent.app/api';
-          static jsonApiType = 'foos';
-          static endpoint = '/custom-endpoint-foo';
+          static jsonApiBaseUrl = 'http://coloquent.app/api'
+          static jsonApiType = 'foos'
+          static endpoint = '/custom-endpoint-foo'
         }
 
         it('returns URL with endpoint', () => {
-          expect(Foo.getJsonApiUrl()).to.eq('http://coloquent.app/api/custom-endpoint-foo')
-        });
+          expect(Foo.getJsonApiUrl()).to.eq(
+            'http://coloquent.app/api/custom-endpoint-foo'
+          )
+        })
 
         describe('when endpoint having no heading "/"', () => {
           class Foo extends Model {
-            static jsonApiBaseUrl = 'http://coloquent.app/api';
-            static jsonApiType = 'foos';
-            static endpoint = 'custom-endpoint-foo';
+            static jsonApiBaseUrl = 'http://coloquent.app/api'
+            static jsonApiType = 'foos'
+            static endpoint = 'custom-endpoint-foo'
           }
 
           it('returns URL with endpoint', () => {
-            expect(Foo.getJsonApiUrl()).to.eq('http://coloquent.app/api/custom-endpoint-foo')
-          });
-        });
-      });
-    });
-  });
-});
+            expect(Foo.getJsonApiUrl()).to.eq(
+              'http://coloquent.app/api/custom-endpoint-foo'
+            )
+          })
+        })
+      })
+    })
+  })
+})

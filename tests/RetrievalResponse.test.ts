@@ -1,276 +1,272 @@
-import {assert, expect} from 'chai';
-import * as chai from 'chai';
-import * as moxios from 'moxios';
-import chaip from 'chai-as-promised';
-import {Hero} from './model1/dummy/Hero';
-import {Hero as HeroWithAntiHeroes} from './model3/dummy/Hero';
-import {Builder} from "../dist";
-import {PaginationStrategy} from "../dist";
-import {Response} from "../dist";
-import {PluralResponse} from "../dist";
-import {SortDirection} from "../dist";
-import {AntiHero} from "./model3/dummy/AntiHero";
+import * as chai from 'chai'
+import { assert } from 'chai'
+import chaip from 'chai-as-promised'
+import * as moxios from 'moxios'
+import { Builder, PluralResponse } from '../dist'
+import { Hero } from './model1/dummy/Hero'
+import { AntiHero } from './model3/dummy/AntiHero'
+import { Hero as HeroWithAntiHeroes } from './model3/dummy/Hero'
 
-chai.use(<any> chaip);
+chai.use(<any>chaip)
 
 describe('RetrievalResponse', () => {
-    let builder: Builder;
-    let model: Hero;
+  let builder: Builder
+  let model: Hero
 
-    beforeEach(() => {
-        moxios.install();
-        builder = new Builder(Hero);
-        model = new Hero();
-    });
+  beforeEach(() => {
+    moxios.install()
+    builder = new Builder(Hero)
+    model = new Hero()
+  })
 
-    afterEach(() => {
-        moxios.uninstall();
-    });
+  afterEach(() => {
+    moxios.uninstall()
+  })
 
-    it('should add models that are included more than once to all references', (done) => {
-        model.foes()
-            .with('foes')
-            .get()
-            .then((response: PluralResponse) => {
-                let beefMan: Hero = <Hero> response.getData()[0];
-                let carrotMan: Hero = <Hero> response.getData()[1];
-                let eggplantManRef1: Hero = beefMan.getFoes()[0];
-                let eggplantManRef2: Hero = carrotMan.getFoes()[0];
+  it('should add models that are included more than once to all references', (done) => {
+    model
+      .foes()
+      .with('foes')
+      .get()
+      .then((response: PluralResponse) => {
+        let beefMan: Hero = <Hero>response.getData()[0]
+        let carrotMan: Hero = <Hero>response.getData()[1]
+        let eggplantManRef1: Hero = beefMan.getFoes()[0]
+        let eggplantManRef2: Hero = carrotMan.getFoes()[0]
 
-                assert(beefMan);
-                assert(carrotMan);
-                assert(eggplantManRef1);
-                assert(eggplantManRef2);
+        assert(beefMan)
+        assert(carrotMan)
+        assert(eggplantManRef1)
+        assert(eggplantManRef2)
 
-                assert(beefMan.getName() === 'BeefMan');
-                assert(carrotMan.getName() === 'CarrotMan');
-                assert(eggplantManRef1.getName() === 'EggplantMan');
-                assert(eggplantManRef2.getName() === 'EggplantMan');
+        assert(beefMan.getName() === 'BeefMan')
+        assert(carrotMan.getName() === 'CarrotMan')
+        assert(eggplantManRef1.getName() === 'EggplantMan')
+        assert(eggplantManRef2.getName() === 'EggplantMan')
 
-                done();
-            });
+        done()
+      })
 
-        moxios.wait(() => {
-            let request = moxios.requests.mostRecent();
-            request.respondWith({
-                response: {
-                    data: [
-                        {
-                            type: "heroes",
-                            id: "1",
-                            attributes: {
-                                name: "BeefMan"
-                            },
-                            relationships: {
-                                foes: {
-                                    data: [
-                                        {
-                                            type: "heroes",
-                                            id: "3"
-                                        }
-                                    ]
-                                }
-                            }
-                        },
-                        {
-                            type: "heroes",
-                            id: "2",
-                            attributes: {
-                                name: "CarrotMan"
-                            },
-                            relationships: {
-                                foes: {
-                                    data: [
-                                        {
-                                            type: "heroes",
-                                            id: "3"
-                                        }
-                                    ]
-                                }
-                            }
-                        },
-                    ],
-                    included: [
-                        {
-                            type: "heroes",
-                            id: "3",
-                            attributes: {
-                                name: "EggplantMan"
-                            }
-                        }
-                    ]
-                }
-            })
-        });
-    });
+    moxios.wait(() => {
+      let request = moxios.requests.mostRecent()
+      request.respondWith({
+        response: {
+          data: [
+            {
+              type: 'heroes',
+              id: '1',
+              attributes: {
+                name: 'BeefMan',
+              },
+              relationships: {
+                foes: {
+                  data: [
+                    {
+                      type: 'heroes',
+                      id: '3',
+                    },
+                  ],
+                },
+              },
+            },
+            {
+              type: 'heroes',
+              id: '2',
+              attributes: {
+                name: 'CarrotMan',
+              },
+              relationships: {
+                foes: {
+                  data: [
+                    {
+                      type: 'heroes',
+                      id: '3',
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          included: [
+            {
+              type: 'heroes',
+              id: '3',
+              attributes: {
+                name: 'EggplantMan',
+              },
+            },
+          ],
+        },
+      })
+    })
+  })
 
-    it('should create empty collections when including without results, instead of leaving relations undefined', (done) => {
-        model.foes()
-            .with('foes')
-            .get()
-            .then((response: PluralResponse) => {
-                let beefMan: Hero = <Hero> response.getData()[0];
-                let foes = beefMan.getFoes();
-                assert(foes !== undefined);
-                assert(foes !== null);
-                assert(Array.isArray(foes));
-                assert(foes.length === 0);
+  it('should create empty collections when including without results, instead of leaving relations undefined', (done) => {
+    model
+      .foes()
+      .with('foes')
+      .get()
+      .then((response: PluralResponse) => {
+        let beefMan: Hero = <Hero>response.getData()[0]
+        let foes = beefMan.getFoes()
+        assert(foes !== undefined)
+        assert(foes !== null)
+        assert(Array.isArray(foes))
+        assert(foes.length === 0)
 
-                done();
-            });
+        done()
+      })
 
-        moxios.wait(() => {
-            let request = moxios.requests.mostRecent();
-            request.respondWith({
-                response: {
-                    data: [
-                        {
-                            type: "heroes",
-                            id: "1",
-                            attributes: {
-                                name: "BeefMan"
-                            },
-                        },
-                    ],
-                }
-            })
-        });
-    });
+    moxios.wait(() => {
+      let request = moxios.requests.mostRecent()
+      request.respondWith({
+        response: {
+          data: [
+            {
+              type: 'heroes',
+              id: '1',
+              attributes: {
+                name: 'BeefMan',
+              },
+            },
+          ],
+        },
+      })
+    })
+  })
 
+  it('should not throw an exception but ignore discovered relations that are not implemented in the models', (done) => {
+    model
+      .foes()
+      .with('foes')
+      .get()
+      .then((response: PluralResponse) => {
+        let beefMan: Hero = <Hero>response.getData()[0]
 
-    it('should not throw an exception but ignore discovered relations that are not implemented in the models', (done) => {
+        done()
+      })
+      .catch((err) => {
+        // it should not come here
+        assert.isTrue(false)
+        done()
+      })
 
-        model.foes()
-            .with('foes')
-            .get()
-            .then((response: PluralResponse) => {
-                let beefMan: Hero = <Hero> response.getData()[0];
+    moxios.wait(() => {
+      let request = moxios.requests.mostRecent()
+      request.respondWith({
+        response: {
+          data: [
+            {
+              type: 'heroes',
+              id: '1',
+              attributes: {
+                name: 'BeefMan',
+              },
+              relationships: {
+                foes: {
+                  data: [
+                    {
+                      type: 'heroes',
+                      id: '3',
+                    },
+                  ],
+                },
+                sidekicks: {
+                  data: [
+                    {
+                      type: 'sidekicks',
+                      id: '1',
+                    },
+                  ],
+                },
+              },
+            },
+            {
+              type: 'heroes',
+              id: '2',
+              attributes: {
+                name: 'CarrotMan',
+              },
+              relationships: {
+                foes: {
+                  data: [
+                    {
+                      type: 'heroes',
+                      id: '3',
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          included: [
+            {
+              type: 'heroes',
+              id: '3',
+              attributes: {
+                name: 'EggplantMan',
+              },
+            },
+            {
+              type: 'sidekicks',
+              id: '1',
+              attributes: {
+                name: 'BurgerBoy',
+              },
+            },
+          ],
+        },
+      })
+    })
+  })
 
-                done();
-            })
-            .catch((err) => {
-                // it should not come here
-                assert.isTrue(false);
-                done();
-            });
+  it('should add relations to the model that were included with kebab casing in the url', (done) => {
+    HeroWithAntiHeroes.with('anti-heroes')
+      .get()
+      .then((response: PluralResponse) => {
+        let hero: HeroWithAntiHeroes = <HeroWithAntiHeroes>response.getData()[0]
+        let antiHeroes: Array<AntiHero> = hero.getAntiHeroes()
 
-        moxios.wait(() => {
-            let request = moxios.requests.mostRecent();
-            request.respondWith({
-                response: {
-                    data: [
-                        {
-                            type: "heroes",
-                            id: "1",
-                            attributes: {
-                                name: "BeefMan"
-                            },
-                            relationships: {
-                                foes: {
-                                    data: [
-                                        {
-                                            type: "heroes",
-                                            id: "3"
-                                        }
-                                    ]
-                                },
-                                sidekicks: {
-                                    data: [
-                                        {
-                                            type: "sidekicks",
-                                            id: "1",
-                                        }
-                                    ]
-                                }
-                            }
-                        },
-                        {
-                            type: "heroes",
-                            id: "2",
-                            attributes: {
-                                name: "CarrotMan"
-                            },
-                            relationships: {
-                                foes: {
-                                    data: [
-                                        {
-                                            type: "heroes",
-                                            id: "3"
-                                        }
-                                    ]
-                                }
-                            }
-                        },
-                    ],
-                    included: [
-                        {
-                            type: "heroes",
-                            id: "3",
-                            attributes: {
-                                name: "EggplantMan"
-                            }
-                        },
-                        {
-                            type: "sidekicks",
-                            id: "1",
-                            attributes: {
-                                name: "BurgerBoy"
-                            }
-                        }
-                    ]
-                }
-            });
-        });
-    });
+        assert(antiHeroes.length > 0)
+        assert(antiHeroes[0].getName() === 'BeefMan')
 
-    it('should add relations to the model that were included with kebab casing in the url', (done) => {
-    HeroWithAntiHeroes
-        .with('anti-heroes')
-        .get()
-        .then((response: PluralResponse) => {
-            let hero: HeroWithAntiHeroes = <HeroWithAntiHeroes> response.getData()[0];
-            let antiHeroes: Array<AntiHero> = hero.getAntiHeroes();
+        done()
+      })
 
-            assert(antiHeroes.length > 0);
-            assert(antiHeroes[0].getName() === 'BeefMan');
-
-            done();
-        });
-
-        moxios.wait(() => {
-            let request = moxios.requests.mostRecent();
-            request.respondWith({
-                response: {
-                    data: [
-                        {
-                            type: "heroes",
-                            id: "1",
-                            attributes: {
-                                name: "BeefMan"
-                            },
-                            relationships: {
-                                "anti-heroes": {
-                                    data: [
-                                        {
-                                            type: "anti-heroes",
-                                            id: "1"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    ],
-                    included: [
-                        {
-                            type: "anti-heroes",
-                            id: "1",
-                            attributes: {
-                                name: "BeefMan"
-                            }
-                        }
-                    ]
-                }
-            })
-        });
-    });
-});
+    moxios.wait(() => {
+      let request = moxios.requests.mostRecent()
+      request.respondWith({
+        response: {
+          data: [
+            {
+              type: 'heroes',
+              id: '1',
+              attributes: {
+                name: 'BeefMan',
+              },
+              relationships: {
+                'anti-heroes': {
+                  data: [
+                    {
+                      type: 'anti-heroes',
+                      id: '1',
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          included: [
+            {
+              type: 'anti-heroes',
+              id: '1',
+              attributes: {
+                name: 'BeefMan',
+              },
+            },
+          ],
+        },
+      })
+    })
+  })
+})

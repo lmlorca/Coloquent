@@ -1,6 +1,5 @@
-export class ResourceStub
-{
-    public type: string;
+export class ResourceStub {
+  public type: string
 
-    public id: string;
+  public id: string
 }
