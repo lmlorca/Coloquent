@@ -3,8 +3,5 @@
 **/*.d.ts
 node_modules
 dist
-
-# IntelliJ
 .idea
-!.idea/codeStyleSettings.xml
-*.iml
+.vscode

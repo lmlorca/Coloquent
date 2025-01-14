@@ -120,6 +120,11 @@ export class Builder<
   public limit(limit: number) {
     const clone = this.clone()
     clone.getQuery().setLimit(limit)
+
+    if (clone.getQuery().getLimit()) {
+      clone.getQuery().getPaginationSpec().setPageLimit(limit)
+    }
+
     return clone
   }
 
@@ -287,6 +292,15 @@ export class Builder<
         uq({
           queryKey: this.getQueryKey('first()'),
           queryFn: () => this.first(),
+          ...opts,
+        }),
+      get: <T extends GET_RESPONSE, TData = T>(
+        page: number = 0,
+        opts?: UseQueryBuilderOptions<T, TData>
+      ) =>
+        uq({
+          queryKey: this.getQueryKey(`get(${page})`),
+          queryFn: () => this.get(page),
           ...opts,
         }),
     }

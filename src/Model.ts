@@ -107,6 +107,10 @@ export abstract class Model {
     return new Builder<M>(this)
   }
 
+  public static useQuery<M extends typeof Model & { new (): Model }>(this: M) {
+    return new Builder<InstanceType<M>>(this).useQuery()
+  }
+
   public static get<M extends typeof Model & { new (): Model }>(
     this: M,
     page?: number

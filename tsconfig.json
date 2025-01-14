@@ -1,15 +1,12 @@
 {
-    "compilerOptions": {
-        "module": "commonjs",
-        "target": "es6",
-        "esModuleInterop": true,
-        "sourceMap": true,
-        "declaration": true,
-        "strictNullChecks": true,
-        "outDir": "./dist"
-    },
-    "exclude": [
-        "tests/**",
-        "dist/**"
-    ]
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "declaration": true,
+    "strictNullChecks": true,
+    "outDir": "./dist"
+  },
+  "exclude": ["tests/**", "dist/**"]
 }
