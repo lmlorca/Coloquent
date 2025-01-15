@@ -107,6 +107,16 @@ export abstract class Model {
     return new Builder<M>(this)
   }
 
+  public static empty<M extends typeof Model & { new (): Model }>(
+    this: M
+  ): InstanceType<M> {
+    if (this === Model) {
+      throw new Error('Cannot create an instance of an abstract class.')
+    }
+
+    return new (this as { new (): Model })() as InstanceType<M>
+  }
+
   public static useQuery<M extends typeof Model & { new (): Model }>(this: M) {
     return new Builder<InstanceType<M>>(this).useQuery()
   }
@@ -168,11 +178,14 @@ export abstract class Model {
     return new Builder<InstanceType<M>>(this).option(queryParameter, value)
   }
 
-  private serialize() {
-    let attributes = {}
-    for (let key in this.attributes.toArray()) {
-      if ((this as Model).constructor.readOnlyAttributes.indexOf(key) == -1) {
-        attributes[key] = this.attributes.get(key)
+  private serialize(modelAttributes?: { [key: string]: any }) {
+    let attributes = modelAttributes || {}
+
+    if (!modelAttributes) {
+      for (let key in this.attributes.toArray()) {
+        if ((this as Model).constructor.readOnlyAttributes.indexOf(key) == -1) {
+          attributes[key] = this.attributes.get(key)
+        }
       }
     }
     let relationships = {}
@@ -189,9 +202,13 @@ export abstract class Model {
       data: {
         type: (this as Model).constructor.effectiveJsonApiType,
         attributes,
-        relationships,
       },
     }
+
+    if (Object.keys(relationships).length) {
+      payload['data']['relationships'] = relationships
+    }
+
     if (this.hasId) {
       payload['data']['id'] = this.id
     }
@@ -217,12 +234,14 @@ export abstract class Model {
     }
   }
 
-  public save(): Promise<SaveResponse<this>> {
+  public save(
+    modelAttributes?: ReturnType<this['getAttributes']>
+  ): Promise<SaveResponse<this>> {
     if (!this.hasId) {
       return this.create()
     }
 
-    let payload = this.serialize()
+    let payload = this.serialize(modelAttributes)
     return (this as Model).constructor.effectiveHttpClient
       .patch(
         (this as Model).constructor.getJsonApiUrl() + '/' + this.id,
@@ -244,8 +263,10 @@ export abstract class Model {
       )
   }
 
-  public create(): Promise<SaveResponse<this>> {
-    let payload = this.serialize()
+  public create(
+    modelAttributes?: ReturnType<this['getAttributes']>
+  ): Promise<SaveResponse<this>> {
+    let payload = this.serialize(modelAttributes)
     return (this as Model).constructor.effectiveHttpClient
       .post((this as Model).constructor.getJsonApiUrl(), payload)
       .then(
@@ -436,8 +457,12 @@ export abstract class Model {
     return this.relations.get(relationName)
   }
 
-  public setRelation(relationName: string, value: any): void {
+  public setRelation(
+    relationName: string,
+    value: Model | Model[] | null
+  ): this {
     this.relations.set(relationName, value)
+    return this
   }
 
   public getAttributes(): { [key: string]: any } {
@@ -476,6 +501,12 @@ export abstract class Model {
     }
 
     this.attributes.set(attributeName, value)
+  }
+
+  protected setAllAttributes(attributes?: { [key: string]: any }): void {
+    for (let key in attributes) {
+      this.setAttribute(key, attributes[key])
+    }
   }
 
   /**

@@ -2,6 +2,8 @@
 import { Builder } from '../Builder'
 import { Model } from '../Model'
 import { PaginationStrategy } from '../PaginationStrategy'
+import { ToManyRelation } from '../relation/ToManyRelation'
+import { ToOneRelation } from '../relation/ToOneRelation'
 
 export class SDK extends Model {
   static jsonApiBaseUrl = ''
@@ -26,11 +28,20 @@ type User = {
       previousLoginDate?: string
       lastLoginDate?: string
     }
+    relationships?: {}
   }
 }
 
+type UserIncluded = null
+
 class UserModel extends SDK {
   static jsonApiType = 'users'
+
+  // Relationships
+
+  setAttributes(attributes?: Partial<User['data']['attributes']>) {
+    this.setAllAttributes(attributes)
+  }
 }
 
 type UserBuilder = Builder<UserModel> & {
@@ -52,6 +63,75 @@ interface UserModel {
   getAttributes(): User['data']['attributes']
 }
 
+type TextSegment = {
+  data: {
+    type: 'textSegments'
+    id: string
+    attributes: {
+      operationId?: string
+      createdDate?: string
+      updatedDate?: string
+      order?: number
+      text?: string
+      pitch?: number
+      speed?: number
+      emotion?: number
+      resemblance?: number
+      emphasis?: number
+      enrichment?: boolean
+      pronunciations?: TextSegmentPronunciations
+      pauses?: TextSegmentPauses
+    }
+    relationships?: {}
+  }
+}
+
+type TextSegmentPronunciations = {
+  selectedText?: string
+  interpretAs?: string
+  alphabet?: string
+  value?: string
+  start?: number
+  end?: number
+}[]
+
+type TextSegmentPauses = {
+  position?: number
+  strength?: string
+  time?: string
+}[]
+
+type TextSegmentIncluded = null
+
+class TextSegmentModel extends SDK {
+  static jsonApiType = 'textSegments'
+
+  // Relationships
+
+  setAttributes(attributes?: Partial<TextSegment['data']['attributes']>) {
+    this.setAllAttributes(attributes)
+  }
+}
+
+type TextSegmentBuilder = Builder<TextSegmentModel> & {
+  /*
+   * Builder instance methods
+   */
+}
+
+type TextSegmentResource = typeof TextSegmentModel & {
+  /*
+   * Model static methods
+   */
+}
+
+interface TextSegmentModel {
+  /*
+   * Model instance methods
+   */
+  getAttributes(): TextSegment['data']['attributes']
+}
+
 type Block = {
   data: {
     type: 'blocks'
@@ -63,11 +143,20 @@ type Block = {
       updatedDate?: string
       segmentsCount?: number
     }
+    relationships?: {}
   }
 }
 
+type BlockIncluded = null
+
 class BlockModel extends SDK {
   static jsonApiType = 'blocks'
+
+  // Relationships
+
+  setAttributes(attributes?: Partial<Block['data']['attributes']>) {
+    this.setAllAttributes(attributes)
+  }
 }
 
 type BlockBuilder = Builder<BlockModel> & {
@@ -109,6 +198,26 @@ type Project = {
       speakers?: ProjectSpeakers
       pronunciations?: ProjectPronunciations
     }
+    relationships?: {
+      organization: {
+        data: {
+          type: 'organizations'
+          id: string
+        }
+      }
+      linguists: {
+        data: {
+          type: 'users'
+          id: string
+        }[]
+      }
+      projectManagers: {
+        data: {
+          type: 'users'
+          id: string
+        }[]
+      }
+    }
   }
 }
 
@@ -148,8 +257,34 @@ type ProjectPronunciations = {
   end?: number
 }[]
 
+type ProjectIncluded = null | Organization['data'] | User['data']
+
 class ProjectModel extends SDK {
   static jsonApiType = 'projects'
+
+  // Relationships
+  organization(): ToOneRelation<OrganizationModel> {
+    return this.hasOne(OrganizationModel)
+  }
+  getOrganization(): OrganizationModel {
+    return this.getRelation('organization')
+  }
+  linguists(): ToManyRelation<UserModel> {
+    return this.hasMany(UserModel)
+  }
+  getLinguists(): UserModel[] {
+    return this.getRelation('linguists')
+  }
+  projectManagers(): ToManyRelation<UserModel> {
+    return this.hasMany(UserModel)
+  }
+  getProjectManagers(): UserModel[] {
+    return this.getRelation('projectManagers')
+  }
+
+  setAttributes(attributes?: Partial<Project['data']['attributes']>) {
+    this.setAllAttributes(attributes)
+  }
 }
 
 type ProjectBuilder = Builder<ProjectModel> & {
@@ -171,76 +306,73 @@ interface ProjectModel {
   getAttributes(): Project['data']['attributes']
 }
 
-type Segment = {
+type Organization = {
   data: {
-    type: 'segments'
+    type: 'organizations'
     id: string
     attributes: {
-      operationId?: string
+      name?: string
+      accountManagerEmail?: string
+      usersCount?: number
+      voicesCount?: number
+      projectAId?: string
+      contactEmail?: string
+      salesTicket?: string
+      notes?: string
+      isJobIdRequired?: boolean
       createdDate?: string
       updatedDate?: string
-      order?: number
-      text?: string
-      pitch?: number
-      speed?: number
-      emotion?: number
-      resemblance?: number
-      emphasis?: number
-      enrichment?: boolean
-      pronunciations?: SegmentPronunciations
-      pauses?: SegmentPauses
+      status?: string
+      organizationQuota?: number
+      retentionDays?: string
     }
+    relationships?: {}
   }
 }
 
-type SegmentPronunciations = {
-  selectedText?: string
-  interpretAs?: string
-  alphabet?: string
-  value?: string
-  start?: number
-  end?: number
-}[]
+type OrganizationIncluded = null
 
-type SegmentPauses = {
-  position?: number
-  strength?: string
-  time?: string
-}[]
+class OrganizationModel extends SDK {
+  static jsonApiType = 'organizations'
 
-class SegmentModel extends SDK {
-  static jsonApiType = 'segments'
+  // Relationships
+
+  setAttributes(attributes?: Partial<Organization['data']['attributes']>) {
+    this.setAllAttributes(attributes)
+  }
 }
 
-type SegmentBuilder = Builder<SegmentModel> & {
+type OrganizationBuilder = Builder<OrganizationModel> & {
   /*
    * Builder instance methods
    */
 }
 
-type SegmentResource = typeof SegmentModel & {
+type OrganizationResource = typeof OrganizationModel & {
   /*
    * Model static methods
    */
 }
 
-interface SegmentModel {
+interface OrganizationModel {
   /*
    * Model instance methods
    */
-  getAttributes(): Segment['data']['attributes']
+  getAttributes(): Organization['data']['attributes']
 }
 
 export const models = {
   users: UserModel,
+  textsegments: TextSegmentModel,
   blocks: BlockModel,
   projects: ProjectModel,
-  segments: SegmentModel,
+  organizations: OrganizationModel,
 }
 
 export type Resources = {
   users: UserResource
+  textsegments: TextSegmentResource
   blocks: BlockResource
   projects: ProjectResource
-  segments: SegmentResource
+  organizations: OrganizationResource
 }
